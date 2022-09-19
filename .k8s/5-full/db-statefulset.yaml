@@ -37,12 +37,9 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   name: db-config
-                  key: timezone
+                  key: TZ
             - name: PGTZ
-              valueFrom:
-                configMapKeyRef:
-                  name: db-config
-                  key: timezone
+              value: $(TZ)
           image: postgres:13
           imagePullPolicy: "IfNotPresent"
           ports:

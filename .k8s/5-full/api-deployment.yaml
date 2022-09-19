@@ -16,19 +16,12 @@ spec:
     spec:
       containers:
         - name: example-api
+          envFrom:
+            - configMapRef:
+                name: db-config
           env:
-            - name: DB_HOST
-              valueFrom:
-                configMapKeyRef:
-                  name: db-config
-                  key: host
             - name: DB_PORT
               value: "5432"
-            - name: DB_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: db-config
-                  key: dbname
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -47,7 +40,7 @@ spec:
             - sh
             - -c
           args:
-            - "dockerize -wait tcp://${DB_HOST}:${DB_PORT} -timeout 20s java -jar api.jar"
+            - "dockerize -wait tcp://$(DB_HOST):$(DB_PORT) -timeout 20s java -jar api.jar"
           ports:
             - name: http
               containerPort: 80

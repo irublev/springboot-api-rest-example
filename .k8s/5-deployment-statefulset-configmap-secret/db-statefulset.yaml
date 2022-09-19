@@ -5,11 +5,11 @@ metadata:
   labels:
     component: db
 spec:
+  replicas: 1
   selector:
     matchLabels:
       component: db
   serviceName: database
-  replicas: 1
   template:
     metadata:
       labels:
@@ -44,6 +44,20 @@ spec:
           imagePullPolicy: "IfNotPresent"
           ports:
             - containerPort: 5432
+          readinessProbe:
+            exec:
+              command: ["psql", "-w", "-U", "$(POSTGRES_USER)", "-d", "$(POSTGRES_DB)", "-c", "SELECT 1"]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command: ["psql", "-w", "-U", "$(POSTGRES_USER)", "-d", "$(POSTGRES_DB)", "-c", "SELECT 1"]
+            initialDelaySeconds: 45
+            timeoutSeconds: 2
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgredb-data

@@ -67,7 +67,7 @@ cd ..
 ### Advantages
 
 - Now volume with database data belongs only to database
-- Now crashing of one component does not lead immediately to stopping the other
+- Components are separated: now crashing of one component does not lead immediately to stopping the other
 
 ### Disadvantages
 
@@ -75,14 +75,66 @@ cd ..
 - Still not scalable
 - If database is restarted, its pod IP changes, so we have to restart also the app,
 much more complex way to connect the app to DB
-- Still bad expose of the app
+- Still bad way of how the app is exposed outside the cluster
 - Still much copy-pasting of parameters
 - Password is hard-coded
 
-## 5. Full
+## 3. Added services and persistence via PVC
 
 ```
-cd ./5-full
+cd ./3-services-with-pvc
+kubectl apply -f db-pvc.yaml
+kubectl apply -f db-pod.yaml
+kubectl apply -f db-service.yaml
+kubectl apply -f api-pod.yaml
+kubectl apply -f api-service.yaml
+cd ..
+```
+
+### Advantages
+
+- Components are separated
+- At last persistence of database data
+- Easy and stable way of how the app connects to DB
+- Easy and stable way to expose the app outside the cluster, now it is possible to implement a way to reach the app not only from the host
+
+### Disadvantages
+
+- Still not scalable
+- Still much copy-pasting of parameters
+- Password is hard-coded
+
+## 4. ReplicaSets
+
+```
+cd ./4-replicasets
+kubectl apply -f db-pvc.yaml
+kubectl apply -f db-replicaset.yaml
+kubectl apply -f db-service.yaml
+kubectl apply -f api-replicaset.yaml
+kubectl apply -f api-service.yaml
+cd ..
+```
+
+### Advantages
+
+- Both components are separated and scalable, possiblity to monitor readiness and liveness of components
+- Database data is persisted
+- Very stable way of how the app connects to DB
+- Very stable and reliable way to expose the app outside the cluster
+ 
+
+### Disadvantages
+
+- Still much copy-pasting of parameters
+- Password is hard-coded
+- Persistent volume is shared between all database pods, thus, impossibility to effectively scale database
+- Impossibility to smoothly update to a new version of the app
+
+## 5. Deployment, StatefulSet, ConfigMap, Secret
+
+```
+cd ./5-deployment-statefulset-configmap-secret
 kubectl apply -f db-config.yaml
 kubectl apply -f db-secret.yaml
 kubectl apply -f db-service.yaml
@@ -94,9 +146,11 @@ cd ..
 
 ### Advantages
 
-- Both components are scalable
-- Database data are persisted
-- Very stable way of how the app communcates with DB
-- Very stable and reliable way to expose the app outside the cluster, now it is possible to reach the app not only from the host
+- Both components are scalable, possiblity to monitor readiness and liveness of components
+- Database data is persisted
+- Very stable way of how the app connects to DB
+- Very stable and reliable way to expose the app outside the cluster
 - Configuration parameters are not copy-pasted
-- Password is in a secret, we can conceal it from some users (will be discussed later)
+- Password is in a secret, we have a way to conceal it from some non-admin users (will be discussed later)
+- Persistent volumes per each DB pod
+- It is possible to roll out a new version of the app smoothly

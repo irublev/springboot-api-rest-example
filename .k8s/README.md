@@ -104,10 +104,10 @@ cd ..
 - Still much copy-pasting of parameters
 - Password is hard-coded
 
-## 4. ReplicaSets
+## 4. ReplicaSets, Readiness and Liveness probes
 
 ```
-cd ./4-replicasets
+cd ./4-replicasets-readiness-liveness
 kubectl apply -f db-pvc.yaml
 kubectl apply -f db-replicaset.yaml
 kubectl apply -f db-service.yaml

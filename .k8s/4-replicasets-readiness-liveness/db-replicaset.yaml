@@ -33,12 +33,12 @@ spec:
             - containerPort: 5432
           readinessProbe:
             exec:
-              command: ["psql", "-w", "-U", "$(POSTGRES_USER)", "-d", "$(POSTGRES_DB)", "-c", "SELECT 1"]
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
             initialDelaySeconds: 15
             timeoutSeconds: 2
           livenessProbe:
             exec:
-              command: ["psql", "-w", "-U", "$(POSTGRES_USER)", "-d", "$(POSTGRES_DB)", "-c", "SELECT 1"]
+              command: ["sh", "-c", "exec pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
             initialDelaySeconds: 45
             timeoutSeconds: 2
           resources:
